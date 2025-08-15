@@ -1,6 +1,6 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
-const startServer = require("./Back-Chronos/src/server");
+const startServer = require("./back/src/server");
 
 function createWindow() {
   const win = new BrowserWindow({
