@@ -1,0 +1,27 @@
+Table equipes {
+  id integer [primary key, increment]
+  nome text [not null]
+  categoria integer [not null]
+}
+
+Table participantes {
+  id integer [primary key, increment]
+  id_equipe integer [not null, ref: > equipes.id]
+  nome text [not null]
+  capitao boolean [not null]
+}
+
+Table tentativas {
+  id integer [primary key, increment]
+  id_equipe integer [not null, ref: > equipes.id]
+  etapa integer [not null, note: '0-3']
+  bateria integer [not null, note: '0-2']
+  tentativa integer [not null, note: '0-1']
+}
+
+Table checkpoints {
+  id integer [primary key, increment]
+  id_tentativa integer [not null, ref: > tentativas.id]
+  num integer [not null]
+  tempo text [not null]
+}

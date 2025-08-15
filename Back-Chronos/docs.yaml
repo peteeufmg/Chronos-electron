@@ -1,0 +1,369 @@
+openapi: 3.0.0
+info:
+  title: Back-Chronos API
+  version: 1.1.0
+  description: API para gerenciamento de equipes, tentativas e ranking do sistema Back-Chronos.
+
+servers:
+  - url: http://localhost:3000
+    description: Servidor local
+
+paths:
+  /equipe:
+    get:
+      summary: Listar todas as equipes
+      description: Retorna todas as equipes cadastradas, incluindo uma lista de participantes (array de nomes, capitão primeiro).
+      responses:
+        "200":
+          description: Lista de equipes com participantes.
+          content:
+            application/json:
+              example:
+                - id: 1
+                  nome: Equipe Alpha
+                  categoria: 1
+                  participantes:
+                    - João
+                    - Maria
+                    - Pedro
+        "500":
+          description: Erro interno do servidor
+          content:
+            application/json:
+              example:
+                error: Erro ao listar equipes
+    post:
+      summary: Criar equipe
+      description: Cria uma nova equipe com participantes. O primeiro participante será o capitão.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              nome: Equipe Beta
+              categoria: 2
+              participantes: ["Carlos", "Ana", "Paulo"]
+      responses:
+        "201":
+          description: Equipe criada com sucesso
+          content:
+            application/json:
+              example:
+                message: Equipe criada com sucesso
+        "500":
+          description: Erro ao criar a equipe
+          content:
+            application/json:
+              example:
+                error: Erro ao criar a equipe
+
+  /equipe/{id_equipe}:
+    get:
+      summary: Listar equipe específica
+      description: Retorna os dados de uma equipe pelo `id_equipe`, incluindo nome, categoria e lista de participantes (array de nomes, capitão primeiro).
+      parameters:
+        - name: id_equipe
+          in: path
+          required: true
+          description: ID da equipe que será retornada.
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Equipe encontrada com participantes
+          content:
+            application/json:
+              example:
+                id: 1
+                nome: Equipe Alpha
+                categoria: 1
+                participantes:
+                  - João
+                  - Maria
+                  - Pedro
+        "404":
+          description: Equipe não encontrada
+          content:
+            application/json:
+              example:
+                error: Equipe não encontrada
+        "500":
+          description: Erro interno do servidor
+          content:
+            application/json:
+              example:
+                error: Erro ao listar equipe
+    put:
+      summary: Atualizar equipe
+      description: Atualiza os dados de uma equipe e seus participantes. Pode ser enviado so um dos dados, caso seja enviado participantes, deve ser enviado todos.
+      parameters:
+        - name: id_equipe
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              nome: Equipe Atualizada
+              categoria: 2
+              participantes: ["Carlos", "Ana"]
+      responses:
+        "200":
+          description: Equipe atualizada com sucesso
+          content:
+            application/json:
+              example:
+                message: Equipe atualizada com sucesso
+        "404":
+          description: Equipe não encontrada
+          content:
+            application/json:
+              example:
+                error: Equipe não encontrada
+        "500":
+          description: Erro ao atualizar a equipe
+          content:
+            application/json:
+              example:
+                error: Erro ao atualizar a equipe
+    delete:
+      summary: Deletar equipe
+      description: Deleta uma equipe pelo `id_equipe`. Remove também todos os participantes associados.
+      parameters:
+        - name: id_equipe
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Equipe deletada com sucesso
+          content:
+            application/json:
+              example:
+                message: Equipe deletada com sucesso
+        "404":
+          description: Equipe não encontrada
+          content:
+            application/json:
+              example:
+                error: Equipe não encontrada
+        "500":
+          description: Erro ao deletar a equipe
+          content:
+            application/json:
+              example:
+                error: Erro ao deletar a equipe
+
+  /tentativa/add:
+    post:
+      summary: Adicionar tentativa
+      description: Cria uma nova tentativa para uma equipe, com os checkpoints de tempo.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              id_equipe: 1
+              etapa: 1
+              bateria: 2
+              tentativa: 1
+              checkpoints: ["00:15:30", "00:30:45"]
+      responses:
+        "201":
+          description: Tentativa criada com sucesso
+          content:
+            application/json:
+              example:
+                message: Tentativa criada com sucesso
+        "409":
+          description: Tentativa já existente
+          content:
+            application/json:
+              example:
+                message: Tentativa já existente
+        "500":
+          description: Erro interno do servidor
+          content:
+            application/json:
+              example:
+                error: Erro ao criar tentativa
+
+  /tentativa/{id_equipe}:
+    post:
+      summary: Listar tentativa de uma equipe
+      description: Retorna a tentativa específica de uma equipe, incluindo os checkpoints.
+      parameters:
+        - name: id_equipe
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              etapa: 1
+              bateria: 2
+              tentativa: 1
+      responses:
+        "200":
+          description: Tentativa encontrada
+          content:
+            application/json:
+              example:
+                id: 5
+                id_equipe: 1
+                etapa: 1
+                bateria: 2
+                tentativa: 1
+                checkpoints:
+                  - id: 1
+                    num: 0
+                    tempo: "00:15:30"
+                  - id: 2
+                    num: 1
+                    tempo: "00:30:45"
+        "404":
+          description: Tentativa não existe
+          content:
+            application/json:
+              example:
+                message: Tentativa não existe
+
+  /tentativa:
+    post:
+      summary: Listar todas as tentativas de uma categoria
+      description: Retorna todas as tentativas de uma categoria, etapa e bateria específicas.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              categoria: 1
+              etapa: 1
+              bateria: 2
+              tentativa: 1
+      responses:
+        "200":
+          description: Lista de tentativas
+          content:
+            application/json:
+              example:
+                - id: 10
+                  id_equipe: 1
+                  etapa: 1
+                  bateria: 2
+                  tentativa: 1
+                  checkpoints:
+                    - id: 1
+                      num: 0
+                      tempo: "00:15:30"
+        "404":
+          description: Nenhuma tentativa encontrada
+          content:
+            application/json:
+              example:
+                message: Não há tentativas nesta categoria
+
+  /tentativa/update/{id_equipe}:
+    post:
+      summary: Atualizar tentativa
+      description: Substitui todos os checkpoints de uma tentativa existente para a equipe informada.
+      parameters:
+        - name: id_equipe
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              etapa: 1
+              bateria: 2
+              tentativa: 1
+              checkpoints: ["00:14:00", "00:28:00"]
+      responses:
+        "200":
+          description: Tentativa atualizada com sucesso
+          content:
+            application/json:
+              example:
+                message: Tentativa atualizada com sucesso
+        "404":
+          description: Tentativa não encontrada
+          content:
+            application/json:
+              example:
+                message: Tentativa não existe
+
+  /tentativa/delete/{id_equipe}:
+    post:
+      summary: Deletar tentativa
+      description: Remove uma tentativa específica de uma equipe.
+      parameters:
+        - name: id_equipe
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              etapa: 1
+              bateria: 2
+              tentativa: 1
+      responses:
+        "200":
+          description: Tentativa deletada com sucesso
+          content:
+            application/json:
+              example:
+                message: Tentativa deletada com sucesso
+        "404":
+          description: Tentativa não encontrada
+          content:
+            application/json:
+              example:
+                message: Tentativa não existe
+
+  /ranking:
+    post:
+      summary: Gerar ranking de uma categoria
+      description: Gera o ranking das equipes de uma categoria, considerando etapas e baterias. Ordena por maior número de checkpoints e menor tempo total.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              categoria: 1
+              etapa: 1
+              bateria: 2
+      responses:
+        "200":
+          description: Ranking gerado
+          content:
+            application/json:
+              example:
+                - nome: Equipe Alpha
+                  checkpoints: 5
+                  tempo_total: "00:45:12"
+                  melhor_tentativa: 2
+                - nome: Equipe Beta
+                  checkpoints: 4
+                  tempo_total: "00:50:30"
+                  melhor_tentativa: 1
+        "404":
+          description: Nenhuma equipe encontrada
+          content:
+            application/json:
+              example:
+                message: Nenhuma equipe encontrada para essa categoria
