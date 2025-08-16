@@ -4,12 +4,12 @@ const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 module.exports = {
     packagerConfig: {
         asar: true,
-        // Este caminho já está correto. Ele pegará o .ico para Windows e o .icns para macOS.
-        icon: './assets/icon',
+        icon: './assets/icon', // Caminho para os ícones (.ico e .icns)
         arch: 'x64' 
     },
     rebuildConfig: {},
     makers: [
+        // Maker para Windows (.exe)
         {
             name: '@electron-forge/maker-squirrel',
             config: {
@@ -19,6 +19,7 @@ module.exports = {
                 setupIcon: './assets/icon.ico' 
             }
         },
+        // Maker para macOS (.dmg)
         {
             name: '@electron-forge/maker-dmg',
             config: {
@@ -26,30 +27,10 @@ module.exports = {
                 name: 'Chronos Installer'
             }
         },
-        // ATUALIZADO: O maker-zip agora constrói para Windows e macOS
+        // Maker para .zip (opcional, para versões portáteis)
         {
             name: '@electron-forge/maker-zip',
             platforms: ['win32', 'darwin'],
-        },
-        // Makers para Linux (mantidos)
-        {
-            name: '@electron-forge/maker-deb',
-            config: {
-                options: {
-                maintainer: 'Julio Teodoro',
-                homepage: 'https://seu-site.com' // Opcional, mas recomendado
-                }
-            },
-        },
-        // ATUALIZADO: Adicionada configuração para o maker do RPM
-        {
-            name: '@electron-forge/maker-rpm',
-            config: {
-                options: {
-                maintainer: 'Julio Teodoro',
-                homepage: 'https://seu-site.com' // Opcional, mas recomendado
-                }
-            },
         },
     ],
     plugins: [
