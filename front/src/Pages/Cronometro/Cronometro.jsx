@@ -1,4 +1,4 @@
-import { Checkbox, ConfigProvider, Drawer, Flex, Input, Select, Typography, message } from "antd";
+import { Checkbox, ConfigProvider, Drawer, Flex, Input, Popconfirm, Radio, Select, Typography, message } from "antd";
 import { useEffect, useRef, useState } from "react";
 import Button from "../../Components/Button";
 import api from "../../Services/api"
@@ -22,7 +22,6 @@ function Cronometro() {
     const [checkpoints, setCheckpoints] = useState([]);
     const [disableSensors, setDisableSensors] = useState(true);
     const [selectedCheckpoint, setSelectedCheckpoint] = useState([]);
-    const sendData = 0;
 
     const startTimeRef = useRef(0); // Remove a tipagem explícita
 
@@ -179,20 +178,37 @@ function Cronometro() {
     // Registra o valor que do tempo a partir do sensor
     const handleSensors = (index) => {
         let updatedCheckpoints = [...checkpoints]; // Cria uma cópia do array
-        if (updatedCheckpoints[index - 1] === 0) updatedCheckpoints[index - 1] = time; // Atualiza o valor
+        if (updatedCheckpoints[index - 1] === undefined) {
+        updatedCheckpoints[index - 1] = time; // Atualiza o valor
         setCheckpoints(updatedCheckpoints); // Define o novo array como o estado
+    }
     }
 
     //Captura tempo do cronometro manualmente
+    //Captura tempo do cronometro manualmente
     const saveTime = () => {
-        let e = false;
-        for(let i = 0; i < 10; i++) {
-            if (checkpoints[i] == undefined && e === false) {
-                let updatedCheckpoints = [...checkpoints]; // Cria uma cópia do array
-                updatedCheckpoints[i] = time; // Atualiza o valor
-                setCheckpoints(updatedCheckpoints); // Define o novo array como o estado
-                e = true;
-                if (i == 6) onStop();
+        // Conta quantos checkpoints já foram preenchidos.
+        const checkpointsPreenchidos = checkpoints.filter(c => c !== undefined).length;
+
+        // Se 7 checkpoints já foram salvos, exibe uma mensagem e não faz mais nada.
+        if (checkpointsPreenchidos >= 7) {
+            displayMessage("warning", "O limite de 7 checkpoints já foi atingido.");
+            return; // Encerra a função aqui.
+        }
+
+        let tempoAdicionado = false;
+        // O laço agora vai de 0 a 6, respeitando o limite de 7 checkpoints.
+        for(let i = 0; i < 7; i++) {
+            if (checkpoints[i] === undefined && !tempoAdicionado) {
+                let updatedCheckpoints = [...checkpoints];
+                updatedCheckpoints[i] = time;
+                setCheckpoints(updatedCheckpoints);
+                tempoAdicionado = true; // Garante que o tempo seja adicionado apenas uma vez.
+                
+                // Se o checkpoint adicionado for o último (índice 6), para o cronômetro.
+                if (i === 6) {
+                    onStop();
+                }
             }
         }
     }
@@ -239,79 +255,86 @@ function Cronometro() {
         });
     }
 
-    // Sensores
-    const [serialData, setSerialData] = useState(null); // Store the serial data
-    const [connected, setConnected] = useState(false); // Track if the serial port is connected
+    const [ports, setPorts] = useState([]);
+    const [selectedPort, setSelectedPort] = useState('');
+    const [serialData, setSerialData] = useState(null);
+    const [connected, setConnected] = useState(false);
+    const [popVisible, setPopVisible] = useState(false);
 
+    // 1. Escuta de dados da serial (é feito apenas uma vez)
     useEffect(() => {
-        if (disableSensors || serialData === null) {
-            setSerialData(null);
+        if (window.serialAPI) {
+            window.serialAPI.onData((data) => {
+                // Remove os espaços em branco que podem vir da serial
+                const trimmedData = data.trim();
+                setSerialData(trimmedData);
+            });
+        }
+    }, []);
+
+    // 2. Atualiza a função de listar portas
+    const updatePorts = async () => {
+        if (!window.serialAPI) {
+            messageApi.error('A API serial não está disponível.');
             return;
         }
-        const numberValue = parseInt(serialData.replace("S",""));
-        switch(numberValue){
-            case 0:
-                onStart();
-                break;
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-            case 6:
-                handleSensors(numberValue);
-                break;
-            case 7:
-                handleSensors(numberValue);
-                onStop();
-                break;
-            default:
-                console.log('Este evento não foi definido');
-                break;
+        try {
+            const list = await window.serialAPI.listPorts();
+            setPorts(list);
+            if (list.length > 0 && !selectedPort) setSelectedPort(list[0].path);
+        } catch (err) {
+            messageApi.error('Erro ao listar portas: ' + err.message);
         }
-        setSerialData(null);
-    }, [serialData]);
-
-    const connectSerialPort = () => {
-    navigator.serial.requestPort()
-        .then(port => {
-        // Open the serial port
-        return port.open({ baudRate: 9600 }).then(() => {
-            const decoder = new TextDecoderStream();
-            port.readable.pipeTo(decoder.writable);
-            const inputStream = decoder.readable.getReader();
-
-            setConnected(true); // Update connection status
-
-            // Read loop
-            function readLoop() {
-            inputStream.read()
-                .then(({ value, done }) => {
-                if (done) {
-                    console.log("Stream closed");
-                    return;
-                }
-                if (value) {
-                    console.log("Received data: ", value);
-                    // Update the serialData state with the new value
-                    setSerialData(e => value); // Append new data
-                    // test(value);
-
-                }
-                // Continue reading
-                readLoop();
-                })
-                .catch(error => console.error("Read error:", error));
-            }
-
-            readLoop(); // Start reading
-        });
-        })
-        .catch(error => {
-            setConnected(false);
-            console.error("Error in serial communication:", error);
-        });
     };
+
+    // 3. Atualiza a função de conectar
+    const handleConnect = async () => {
+        if (!selectedPort) {
+            messageApi.error('Selecione uma porta!');
+            return;
+        }
+        try {
+            const result = await window.serialAPI.connect(selectedPort);
+            if (result.success) {
+                setConnected(true);
+                messageApi.success(`Conectado à porta ${result.path}`);
+            } else {
+                messageApi.error(`Falha ao conectar: ${result.error}`);
+            }
+        } catch (err) {
+            messageApi.error('Erro ao conectar: ' + err.message);
+        }
+        setPopVisible(false);
+    };
+
+    // 4. Lógica dos sensores (sem alterações, mas agora deve funcionar)
+    useEffect(() => {
+        if (!serialData || disableSensors) return;
+        
+        const numberValue = parseInt(serialData);
+        switch (numberValue) {
+        case 0:
+            onStart();
+            break;
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7: // Adicionado caso 7 aqui
+            handleSensors(numberValue);
+            if (numberValue === 7) {
+                onStop();
+            }
+            break;
+        default:
+            console.log('Evento não definido para:', serialData);
+            break;
+        }
+        
+    }, [serialData, disableSensors]);
+
 
     // Parte do Sorteio da página
     const [abrirSorteio, setAbrirSorteio] = useState(false);
@@ -402,9 +425,36 @@ function Cronometro() {
                             </Flex>
                             {/* Coluna 2 */}
                             <Flex style={{height: "60%"}} justify="space-around" vertical>
-                                <Button onClick={connectSerialPort} type={connected ? "" : "Connect"} text={connected ? "Conectado" : "Conectar"} />
+                                <Popconfirm
+                                    title={
+                                    <div>
+                                        <p>Escolha a porta para conectar:</p>
+                                        <Radio.Group
+                                        value={selectedPort}
+                                        onChange={(e) => setSelectedPort(e.target.value)}
+                                        >
+                                        {ports.map((p) => (
+                                            <Radio key={p.path} value={p.path}>
+                                            {p.path} {p.manufacturer || ''}
+                                            </Radio>
+                                        ))}
+                                        </Radio.Group>
+                                    </div>
+                                    }
+                                    open={popVisible}
+                                    onConfirm={handleConnect}
+                                    onCancel={() => setPopVisible(false)}
+                                    okText="Conectar"
+                                    cancelText="Cancelar"
+                                    onOpenChange={(visible) => {
+                                    setPopVisible(visible);
+                                    if (visible) updatePorts();
+                                    }}
+                                >
+                                    <Button type={connected ? "" : "Connect"} onClick={() => setPopVisible(true)} text={connected ? "Conectado" : "Conectar"} />
+                                </Popconfirm>
                                 <Checkbox
-                                    onChange={e => setDisableSensors(!e.target.checked)}
+                                    onChange={e => {setDisableSensors(!e.target.checked); setSerialData(null); }}
                                 >Ativar Sensores</Checkbox>
                             </Flex>
                         </Flex>

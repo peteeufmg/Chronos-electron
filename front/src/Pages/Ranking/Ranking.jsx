@@ -84,8 +84,8 @@ export default function Ranking() {
     return(
         <Flex style={{width: "100%"}} gap="25px" vertical align="center">
             {contextHolder}
-            <Flex style={{maxWidth: "900px"}} align="center" gap={"25px"} vertical>
-                <Flex align="center" gap="middle">
+            <Flex style={{maxWidth: "900px", width: '100%'}} gap={"25px"} vertical>
+                <Flex align="center" gap="middle" justify="center">
                     <Select 
                         style={{ width: 200 }}
                         onChange={e => setCategoria(e)}
@@ -120,17 +120,20 @@ export default function Ranking() {
                     </Select>
                 </Flex>
                 <Flex>
-                    <Table
-                        columns={colunas} 
-                        dataSource={ranking}
-                        pagination={false}
-                        style={{width: "100%", fontWeight: 700}}
-                        loading={loading}
-                        rowKey={"nome"}
-                        scroll={{
-                            y: 500,
-                        }}
-                    />
+                    <div style={{ width: '100%' }}>
+                        <Table
+                            columns={colunas} 
+                            dataSource={ranking}
+                            pagination={false}
+                            style={{ fontWeight: 700 }} // O width aqui é opcional, a tabela deve preencher a div
+                            loading={loading}
+                            rowKey={"nome"}
+                            scroll={{
+                                y: "100%",
+                            }}
+                            bordered
+                        />
+                    </div>
                 </Flex>
             </Flex>
         </Flex>

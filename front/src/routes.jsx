@@ -1,5 +1,5 @@
 import {
-    createBrowserRouter,
+    createHashRouter, // <--- ALTERADO
     createRoutesFromElements,
     Route,
     RouterProvider,
@@ -10,7 +10,7 @@ import Home from "./Pages/Home";
 import Equipes from "./Pages/Equipes";
 import Ranking from "./Pages/Ranking";
 import Sorteio from "./Pages/Sorteio";
-import CronometroSQL from "./Pages/CronometroSQL";
+import Cronometro from "./Pages/Cronometro";
 import NavBar from "./Components/NavBar";
 
 // Layout com Navbar
@@ -23,7 +23,7 @@ function MainLayout() {
     );
 }
 
-const router = createBrowserRouter(
+const router = createHashRouter(
     createRoutesFromElements(
         <Route>
             {/* Rota sem navbar */}
@@ -34,7 +34,7 @@ const router = createBrowserRouter(
                 <Route path="/equipes" element={<Equipes />} />          
                 <Route path="/classificacao" element={<Ranking />} />
                 <Route path="/sorteio" element={<Sorteio />} />
-                <Route path="/cronometro" element={<CronometroSQL />} />
+                <Route path="/cronometro" element={<Cronometro />} />
             </Route>
         </Route>
     )

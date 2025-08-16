@@ -1,5 +1,6 @@
 import {styled} from 'styled-components';
 
+
 export const DivContainer = styled.div`
     display: flex;
     flex-direction: column;
@@ -33,7 +34,7 @@ export const Title = styled.h1`
     
 `;
 
-export const Link = styled.a`
+export const Links = styled.div`
     display: flex;
     color: black;
     font-optical-sizing: auto;

@@ -3,10 +3,15 @@
   "version": "1.0.0",
   "main": "electron.js",
   "scripts": {
-    "start-frontend": "cd Front-ChronosWeb && npm run dev",
+    "start-frontend": "cd front && npm run dev",
+    "preview-frontend": "cd front && npm run dev",
     "start-electron-dev": "npm run start-frontend & npx electron .",
-    "build-frontend": "vite build",
-    "start-electron-build": "npm run build-frontend && npx electron ."
+    "start-electron-preview": "npm run preview-frontend & npx electron .",
+    "build-frontend": "cd front && npm run build",
+    "start-electron-build": "npm run build-frontend && npx electron .",
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "author": "",
   "license": "ISC",
@@ -15,13 +20,24 @@
     "antd": "^5.27.0",
     "better-sqlite3": "^12.2.0",
     "cors": "^2.8.5",
-    "electron": "^37.3.0",
+    "electron-squirrel-startup": "^1.0.1",
     "express": "^5.1.0",
     "react": "^19.1.1",
     "react-router-dom": "^7.8.0",
+    "serialport": "^13.0.0",
     "vite": "^7.1.2"
   },
   "devDependencies": {
+    "@electron-forge/cli": "^7.8.3",
+    "@electron-forge/maker-deb": "^7.8.3",
+    "@electron-forge/maker-dmg": "^7.8.3",
+    "@electron-forge/maker-rpm": "^7.8.3",
+    "@electron-forge/maker-squirrel": "^7.8.3",
+    "@electron-forge/maker-zip": "^7.8.3",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.8.3",
+    "@electron-forge/plugin-fuses": "^7.8.3",
+    "@electron/fuses": "^1.8.0",
+    "electron": "^37.3.0",
     "electron-rebuild": "^3.2.9"
   }
 }

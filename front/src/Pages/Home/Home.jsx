@@ -1,4 +1,5 @@
-import { DivContainer, DivTitle, DivLinks, Title, Link} from './style';
+import { DivContainer, DivTitle, DivLinks, Title, Links} from './style';
+import { Link } from 'react-router-dom';
 import React from "react";
 
 function Home() {
@@ -8,11 +9,11 @@ function Home() {
                     <Title>chronos web</Title>
                 </DivTitle>
                 <DivLinks>
-                    <Link href='/cronometro'>Cronômetro</Link>
-                    <Link href='/sorteio'>Sorteios</Link>
-                    <Link href='/classificacao'>Ranking</Link>
-                    <Link href='/equipes'>Equipes</Link>
-                    <Link href='/sumo'>Sumô</Link>
+                    <Link to='/cronometro'><Links>Cronômetro</Links></Link>
+                    <Link to='/sorteio'><Links>Sorteios</Links></Link>
+                    <Link to='/classificacao'><Links>Ranking</Links></Link>
+                    <Link to='/equipes'><Links>Equipes</Links></Link>
+                    <Link to='/sumo'><Links>Sumô</Links></Link>
                 </DivLinks>
             </DivContainer>
     )

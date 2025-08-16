@@ -1,25 +1,61 @@
-const { app, BrowserWindow } = require('electron');
+// electron.js
+
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+const { URL } = require('url'); // 1. Adicione a importação do URL
+const { SerialPort } = require('serialport');
 const startServer = require("./back/src/server");
+
+let port;
 
 function createWindow() {
   const win = new BrowserWindow({
     width: 1024,
     height: 768,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false
     },
   });
 
-  // Defina a URL de dev manualmente (sem .env)
-  const isDev = true; // coloque false quando for build
-  const devURL = "http://localhost:5173";
+  // ... (o seu código ipcMain permanece igual)
+  ipcMain.handle('serial:listPorts', async () => {
+    return await SerialPort.list();
+  });
+
+  ipcMain.handle('serial:connect', async (event, path) => {
+    if (port && port.isOpen) {
+      port.close();
+    }
+    try {
+      port = new SerialPort({ path, baudRate: 9600 });
+      
+      port.on('data', (data) => {
+        win.webContents.send('serial:data', data.toString());
+      });
+
+      return { success: true, path };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
+
+
+  const isDev = false;
+  const devURL = "http://localhost:5175";
 
   if (isDev) {
     win.loadURL(devURL);
+    win.webContents.openDevTools();
   } else {
-    win.loadFile(path.join(__dirname, 'frontend/build/index.html'));
+    // 2. ALTERE ESTA PARTE
+    // Em vez de win.loadFile, use win.loadURL com o caminho do ficheiro construído corretamente.
+    const appURL = new URL(
+      path.join(__dirname, 'front/dist/index.html'),
+      'file:'
+    ).toString();
+    win.loadURL(appURL);
   }
 }
 
@@ -29,5 +65,5 @@ app.on('ready', () => {
 });
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+  app.quit();
 });

@@ -4,6 +4,7 @@ const { app } = require("electron");
 
 // Caminho do banco dentro da pasta de dados do usuário
 const dbPath = path.join(app.getPath('userData'), 'exemple.db');
+// const dbPath = '../exemple.db';
 const db = new Database(dbPath);
 
 // Inicializar as tabelas do banco de dados
@@ -46,6 +47,30 @@ db.prepare(`
     )
 `).run();
 
+db.prepare(`
+    CREATE TABLE IF NOT EXISTS sorteios (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        categoria INTEGER NOT NULL,
+        etapa INTEGER NOT NULL,
+        bateria INTEGER NOT NULL,
+        data_sorteio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(categoria, etapa, bateria)
+    )
+`).run();
+
+db.prepare(`
+    CREATE TABLE IF NOT EXISTS sorteio_equipes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id_sorteio INTEGER NOT NULL,
+        id_equipe INTEGER NOT NULL,
+        ordem INTEGER NOT NULL,
+        FOREIGN KEY(id_sorteio) REFERENCES sorteios(id) ON DELETE CASCADE,
+        FOREIGN KEY(id_equipe) REFERENCES equipes(id) ON DELETE CASCADE,
+        UNIQUE(id_sorteio, id_equipe),
+        UNIQUE(id_sorteio, ordem)
+    )
+`).run();
+
 // Função para fechar o DB com segurança
 const fecharDB = () => {
     if (db.open) {
@@ -56,7 +81,7 @@ const fecharDB = () => {
 };
 
 // Fechamento seguro com Electron
-app.on('will-quit', fecharDB);
+// app.on('will-quit', fecharDB);
 
 // Fechamento seguro em sinais do processo
 process.on('SIGINT', () => { fecharDB(); process.exit(0); });
