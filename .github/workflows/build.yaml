@@ -14,7 +14,8 @@ jobs:
     # Usa uma "matriz de estratégia" para executar o mesmo trabalho em diferentes sistemas operativos
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        # ATUALIZADO: 'ubuntu-latest' foi removido da lista
+        os: [macos-latest, windows-latest]
 
     # Define o tipo de máquina virtual a ser usada com base na matriz
     runs-on: ${{ matrix.os }}
