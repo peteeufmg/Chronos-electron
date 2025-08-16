@@ -34,11 +34,22 @@ module.exports = {
         // Makers para Linux (mantidos)
         {
             name: '@electron-forge/maker-deb',
-            config: {},
+            config: {
+                options: {
+                maintainer: 'Julio Teodoro',
+                homepage: 'https://seu-site.com' // Opcional, mas recomendado
+                }
+            },
         },
+        // ATUALIZADO: Adicionada configuração para o maker do RPM
         {
             name: '@electron-forge/maker-rpm',
-            config: {},
+            config: {
+                options: {
+                maintainer: 'Julio Teodoro',
+                homepage: 'https://seu-site.com' // Opcional, mas recomendado
+                }
+            },
         },
     ],
     plugins: [
