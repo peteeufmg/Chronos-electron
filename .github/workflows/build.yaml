@@ -1,0 +1,49 @@
+# .github/workflows/build.yml
+
+name: Build & Release
+
+# Define quando esta ação será executada
+on:
+  push:
+    branches: [ "main" ] # Executa quando houver um push para a branch 'main'
+  pull_request:
+    branches: [ "main" ] # Executa quando houver um pull request para a branch 'main'
+
+jobs:
+  build:
+    # Usa uma "matriz de estratégia" para executar o mesmo trabalho em diferentes sistemas operativos
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+
+    # Define o tipo de máquina virtual a ser usada com base na matriz
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      # 1. Baixa o código do seu repositório para a máquina virtual
+      - name: Check out git repository
+        uses: actions/checkout@v4
+
+      # 2. Configura o ambiente Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Use a versão do Node.js do seu projeto
+          cache: 'npm'
+
+      # 3. Instala todas as dependências do projeto
+      - name: Install dependencies
+        run: npm install
+
+      # 4. Executa o comando de build (o mesmo que você usa localmente)
+      # O Electron Forge irá automaticamente criar o pacote para o sistema operativo da máquina virtual
+      - name: Build application
+        run: npm run make
+
+      # 5. Carrega os ficheiros construídos como "artefatos"
+      # Isto permite que você descarregue os ficheiros .exe, .dmg, etc., após a conclusão
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os }}-build
+          path: out/make
