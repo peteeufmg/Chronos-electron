@@ -1,52 +1,44 @@
-# .github/workflows/build.yml
+# .github/workflows/build.yaml
 
 name: Build & Release
 
-# Define quando esta ação será executada
 on:
   push:
-    branches: [ "main" ] # Executa quando houver um push para a branch 'main'
+    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ] # Executa quando houver um pull request para a branch 'main'
+    branches: [ "main" ]
 
 jobs:
-  build:
-    # Usa uma "matriz de estratégia" para executar o mesmo trabalho em diferentes sistemas operativos
+  build: # Nome do job
+    # As chaves a seguir (strategy, runs-on, steps) devem estar indentadas sob 'build'
     strategy:
       matrix:
-        # ATUALIZADO: 'ubuntu-latest' foi removido da lista
         os: [macos-latest, windows-latest]
 
-    # Define o tipo de máquina virtual a ser usada com base na matriz
     runs-on: ${{ matrix.os }}
 
-  steps:
-    # 1. Baixa o código do seu repositório
-    - name: Check out git repository
-      uses: actions/checkout@v4
+    steps:
+      # Cada passo (com '-') deve estar indentado sob 'steps'
+      - name: Check out git repository
+        uses: actions/checkout@v4
 
-    # 2. Configura o ambiente Node.js
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
 
-    # 3. Instala todas as dependências
-    - name: Install dependencies
-      run: npm install
+      - name: Install dependencies
+        run: npm install
 
-    # 4. (NOVO PASSO ADICIONADO) Compila o frontend
-    - name: Build Frontend
-      run: npm run build-frontend
+      - name: Build Frontend
+        run: npm run build-frontend
 
-    # 5. (Passo antigo agora é o 5) Executa o comando de build do Electron
-    - name: Build application
-      run: npm run make
+      - name: Build application
+        run: npm run make
 
-    # 6. Carrega os artefatos
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ matrix.os }}-build
-        path: out/make
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os }}-build
+          path: out/make
