@@ -6,7 +6,7 @@ function Home() {
     return (
             <DivContainer>
                 <DivTitle>
-                    <Title>chronos web</Title>
+                    <Title>Chronos</Title>
                 </DivTitle>
                 <DivLinks>
                     <Link to='/cronometro'><Links>Cronômetro</Links></Link>

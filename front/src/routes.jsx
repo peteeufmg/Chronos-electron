@@ -1,24 +1,26 @@
+import { lazy, Suspense } from "react";
 import {
-    createHashRouter, // <--- ALTERADO
+    createHashRouter,
     createRoutesFromElements,
     Route,
     RouterProvider,
     Outlet,
 } from "react-router-dom";
 
-import Home from "./Pages/Home";
-import Equipes from "./Pages/Equipes";
-import Ranking from "./Pages/Ranking";
-import Sorteio from "./Pages/Sorteio";
-import Cronometro from "./Pages/Cronometro";
 import NavBar from "./Components/NavBar";
+
+const Home = lazy(() => import("./Pages/Home"));
+const Equipes = lazy(() => import("./Pages/Equipes"));
+const Ranking = lazy(() => import("./Pages/Ranking"));
+const Sorteio = lazy(() => import("./Pages/Sorteio"));
+const Cronometro = lazy(() => import("./Pages/Cronometro"));
 
 // Layout com Navbar
 function MainLayout() {
     return (
         <>
             <NavBar />
-            <Outlet /> {/* Aqui vão aparecer as páginas dentro desse layout */}
+            <Outlet />
         </>
     );
 }
@@ -41,5 +43,9 @@ const router = createHashRouter(
 );
 
 export default function Routes() {
-    return <RouterProvider router={router} />
+    return (
+        <Suspense fallback={<div>Carregando...</div>}>
+            <RouterProvider router={router} />
+        </Suspense>
+    );
 }

@@ -20,31 +20,33 @@ jobs:
     # Define o tipo de máquina virtual a ser usada com base na matriz
     runs-on: ${{ matrix.os }}
 
-    steps:
-      # 1. Baixa o código do seu repositório para a máquina virtual
-      - name: Check out git repository
-        uses: actions/checkout@v4
+  steps:
+    # 1. Baixa o código do seu repositório
+    - name: Check out git repository
+      uses: actions/checkout@v4
 
-      # 2. Configura o ambiente Node.js
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20' # Use a versão do Node.js do seu projeto
-          cache: 'npm'
+    # 2. Configura o ambiente Node.js
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
 
-      # 3. Instala todas as dependências do projeto
-      - name: Install dependencies
-        run: npm install
+    # 3. Instala todas as dependências
+    - name: Install dependencies
+      run: npm install
 
-      # 4. Executa o comando de build (o mesmo que você usa localmente)
-      # O Electron Forge irá automaticamente criar o pacote para o sistema operativo da máquina virtual
-      - name: Build application
-        run: npm run make
+    # 4. (NOVO PASSO ADICIONADO) Compila o frontend
+    - name: Build Frontend
+      run: npm run build-frontend
 
-      # 5. Carrega os ficheiros construídos como "artefatos"
-      # Isto permite que você descarregue os ficheiros .exe, .dmg, etc., após a conclusão
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.os }}-build
-          path: out/make
+    # 5. (Passo antigo agora é o 5) Executa o comando de build do Electron
+    - name: Build application
+      run: npm run make
+
+    # 6. Carrega os artefatos
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.os }}-build
+        path: out/make
