@@ -1,27 +1,54 @@
+// Documentação do Banco de Dados para o projeto Chronos
+// Dialeto do banco de dados: SQLite
+
 Table equipes {
-  id integer [primary key, increment]
+  id integer [pk, increment]
   nome text [not null]
   categoria integer [not null]
 }
 
 Table participantes {
-  id integer [primary key, increment]
+  id integer [pk, increment]
   id_equipe integer [not null, ref: > equipes.id]
   nome text [not null]
   capitao boolean [not null]
 }
 
 Table tentativas {
-  id integer [primary key, increment]
+  id integer [pk, increment]
   id_equipe integer [not null, ref: > equipes.id]
-  etapa integer [not null, note: '0-3']
-  bateria integer [not null, note: '0-2']
-  tentativa integer [not null, note: '0-1']
+  etapa integer [not null, note: 'Valor entre 0 e 3']
+  bateria integer [not null, note: 'Valor entre 0 e 2']
+  tentativa integer [not null, note: 'Valor entre 0 e 1']
 }
 
 Table checkpoints {
-  id integer [primary key, increment]
+  id integer [pk, increment]
   id_tentativa integer [not null, ref: > tentativas.id]
   num integer [not null]
   tempo text [not null]
+}
+
+Table sorteios {
+  id integer [pk, increment]
+  categoria integer [not null]
+  etapa integer [not null]
+  bateria integer [not null]
+  data_sorteio timestamp [default: `CURRENT_TIMESTAMP`]
+  
+  indexes {
+    (categoria, etapa, bateria) [unique]
+  }
+}
+
+Table sorteio_equipes {
+  id integer [pk, increment]
+  id_sorteio integer [not null, ref: > sorteios.id]
+  id_equipe integer [not null, ref: > equipes.id]
+  ordem integer [not null]
+  
+  indexes {
+    (id_sorteio, id_equipe) [unique]
+    (id_sorteio, ordem) [unique]
+  }
 }

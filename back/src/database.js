@@ -1,9 +1,39 @@
 const Database = require("better-sqlite3");
 const path = require('path');
 const { app } = require("electron");
+const fs = require('fs');
 
-// Caminho do banco dentro da pasta de dados do usuário
-const dbPath = path.join(app.getPath('userData'), 'exemple.db');
+const isProd = app.isPackaged;
+
+let dbPath;
+
+if (isProd) {
+    let dbDir;
+    // Verifica se a plataforma é macOS ('darwin')
+    if (process.platform === 'darwin') {
+        // No macOS, o executável está dentro de várias pastas.
+        // Ex: /Pendrive/Chronos_Mac/Chronos.app/Contents/MacOS/Chronos
+        // Precisamos subir 4 níveis para chegar à raiz do pendrive.
+        dbDir = path.join(path.dirname(app.getPath('exe')), '..', '..', '..', '..', 'database');
+    } else {
+        // No Windows e Linux, o executável está na raiz da pasta da aplicação.
+        // Ex: /Pendrive/Chronos_Windows/Chronos.exe
+        // Precisamos subir apenas 1 nível.
+        dbDir = path.join(path.dirname(app.getPath('exe')), '..', 'database');
+    }
+    
+    // Garante que o diretório do banco de dados exista
+    if (!fs.existsSync(dbDir)) {
+        fs.mkdirSync(dbDir, { recursive: true });
+    }
+    
+    dbPath = path.join(dbDir, 'chronos.db');
+} else {
+    // Em desenvolvimento, usa um banco de dados na raiz do projeto
+    dbPath = path.resolve(__dirname, '..', 'chronos.db');
+}
+
+console.log(`Caminho do banco de dados: ${dbPath}`);
 // const dbPath = '../exemple.db';
 const db = new Database(dbPath);
 

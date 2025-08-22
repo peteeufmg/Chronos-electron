@@ -1,0 +1,561 @@
+openapi: 3.0.0
+info:
+  title: API de Competição Chronos
+  description: Documentação da API para gerenciar equipes, tentativas, sorteios e rankings de uma competição.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Servidor de Desenvolvimento Local
+tags:
+  - name: Equipes
+    description: Operações para criar, listar, atualizar e deletar equipes e seus participantes.
+  - name: Tentativas
+    description: Gerenciamento das tentativas e checkpoints das equipes em cada bateria.
+  - name: Sorteio
+    description: Endpoints para realizar e consultar o sorteio da ordem das equipes.
+  - name: Ranking
+    description: Endpoint para gerar o ranking com base no desempenho das equipes.
+
+paths:
+  /equipe:
+    get:
+      tags:
+        - Equipes
+      summary: Listar todas as equipes
+      description: Retorna uma lista de todas as equipes cadastradas, com seus respectivos participantes. Permite filtrar por categoria.
+      parameters:
+        - in: query
+          name: categoria
+          schema:
+            type: integer
+          required: false
+          description: Filtra as equipes por uma categoria específica.
+      responses:
+        '200':
+          description: Lista de equipes retornada com sucesso.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EquipeCompleta'
+        '500':
+          description: Erro interno no servidor.
+    post:
+      tags:
+        - Equipes
+      summary: Criar uma nova equipe
+      description: Cadastra uma nova equipe e seus participantes. O primeiro participante da lista é definido como capitão.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NovaEquipe'
+      responses:
+        '201':
+          description: Equipe criada com sucesso.
+        '500':
+          description: Erro ao criar a equipe.
+
+  /equipe/c/{categoria}:
+    get:
+      tags:
+        - Equipes
+      summary: Listar equipes por categoria
+      description: Retorna uma lista de todas as equipes de uma categoria específica.
+      parameters:
+        - in: path
+          name: categoria
+          required: true
+          schema:
+            type: integer
+          description: O ID da categoria.
+      responses:
+        '200':
+          description: Lista de equipes da categoria.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EquipeCompleta'
+        '404':
+          description: Nenhuma equipe encontrada.
+        '500':
+          description: Erro interno no servidor.
+
+  /equipe/{id_equipe}:
+    get:
+      tags:
+        - Equipes
+      summary: Buscar uma equipe por ID
+      description: Retorna os detalhes de uma equipe específica, incluindo seus participantes.
+      parameters:
+        - in: path
+          name: id_equipe
+          required: true
+          schema:
+            type: integer
+          description: ID da equipe a ser buscada.
+      responses:
+        '200':
+          description: Detalhes da equipe.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EquipeCompleta'
+        '404':
+          description: Equipe não encontrada.
+        '500':
+          description: Erro ao listar a equipe.
+    put:
+      tags:
+        - Equipes
+      summary: Atualizar uma equipe
+      description: Atualiza o nome, categoria e/ou a lista de participantes de uma equipe. A lista de participantes, se enviada, substitui completamente a anterior.
+      parameters:
+        - in: path
+          name: id_equipe
+          required: true
+          schema:
+            type: integer
+          description: ID da equipe a ser atualizada.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AtualizarEquipe'
+      responses:
+        '200':
+          description: Equipe atualizada com sucesso.
+        '404':
+          description: Equipe não encontrada.
+        '500':
+          description: Erro ao atualizar a equipe.
+    delete:
+      tags:
+        - Equipes
+      summary: Deletar uma equipe
+      description: Remove uma equipe e todos os seus participantes do banco de dados.
+      parameters:
+        - in: path
+          name: id_equipe
+          required: true
+          schema:
+            type: integer
+          description: ID da equipe a ser deletada.
+      responses:
+        '200':
+          description: Equipe deletada com sucesso.
+        '404':
+          description: Equipe não encontrada.
+        '500':
+          description: Erro ao deletar a equipe.
+
+  /tentativa/add:
+    post:
+      tags:
+        - Tentativas
+      summary: Adicionar uma nova tentativa
+      description: Adiciona uma tentativa para uma equipe com seus respectivos checkpoints.
+      parameters:
+        - $ref: '#/components/parameters/IdEquipeQuery'
+        - $ref: '#/components/parameters/EtapaQuery'
+        - $ref: '#/components/parameters/BateriaQuery'
+        - $ref: '#/components/parameters/TentativaQuery'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                checkpoints:
+                  type: array
+                  items:
+                    type: string
+                    example: "00:15.321"
+      responses:
+        '201':
+          description: Tentativa criada com sucesso.
+        '409':
+          description: A tentativa já existe.
+        '500':
+          description: Erro ao criar a tentativa.
+
+  /tentativa:
+    get:
+      tags:
+        - Tentativas
+      summary: Listar todas as tentativas de uma bateria
+      description: Lista todas as tentativas de uma determinada categoria, etapa, bateria e número de tentativa.
+      parameters:
+        - $ref: '#/components/parameters/CategoriaQuery'
+        - $ref: '#/components/parameters/EtapaQuery'
+        - $ref: '#/components/parameters/BateriaQuery'
+        - $ref: '#/components/parameters/TentativaQuery'
+      responses:
+        '200':
+          description: Lista de tentativas com checkpoints.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TentativaCompleta'
+        '404':
+          description: Não há tentativas nesta categoria.
+        '500':
+          description: Erro ao listar tentativas.
+
+  /tentativa/update/{id_equipe}:
+    put:
+      tags:
+        - Tentativas
+      summary: Atualizar os checkpoints de uma tentativa
+      description: Atualiza a lista de checkpoints de uma tentativa existente. A lista enviada substitui completamente a anterior.
+      parameters:
+        - $ref: '#/components/parameters/IdEquipePath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AtualizarTentativa'
+      responses:
+        '200':
+          description: Tentativa atualizada com sucesso.
+        '404':
+          description: Tentativa não existe.
+        '500':
+          description: Erro ao atualizar a tentativa.
+
+  /tentativa/{id_equipe}:
+    get:
+      tags:
+        - Tentativas
+      summary: Listar tentativa de uma equipe
+      description: Busca uma tentativa específica de uma equipe, com base na etapa, bateria e número da tentativa.
+      parameters:
+        - $ref: '#/components/parameters/IdEquipePath'
+        - $ref: '#/components/parameters/EtapaQuery'
+        - $ref: '#/components/parameters/BateriaQuery'
+        - $ref: '#/components/parameters/TentativaQuery'
+      responses:
+        '200':
+          description: Dados da tentativa com seus checkpoints.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TentativaCompleta'
+        '204':
+          description: Nenhuma tentativa encontrada para os filtros informados.
+        '500':
+          description: Erro ao listar tentativa.
+    delete:
+      tags:
+        - Tentativas
+      summary: Deletar uma tentativa
+      description: Deleta uma tentativa específica de uma equipe.
+      parameters:
+        - $ref: '#/components/parameters/IdEquipePath'
+        - $ref: '#/components/parameters/EtapaQuery'
+        - $ref: '#/components/parameters/BateriaQuery'
+        - $ref: '#/components/parameters/TentativaQuery'
+      responses:
+        '200':
+          description: Tentativa deletada com sucesso.
+        '404':
+          description: Tentativa não existe.
+        '500':
+          description: Erro ao deletar tentativa.
+
+  /sorteio:
+    post:
+      tags:
+        - Sorteio
+      summary: Armazenar resultado de um sorteio
+      description: Cria um registro de sorteio para uma categoria, etapa e bateria, armazenando a ordem das equipes.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NovoSorteio'
+      responses:
+        '201':
+          description: Sorteio armazenado com sucesso.
+        '400':
+          description: Dados inválidos.
+        '409':
+          description: Este sorteio já existe.
+        '500':
+          description: Erro interno no servidor.
+    get:
+      tags:
+        - Sorteio
+      summary: Buscar resultado de um sorteio
+      description: Retorna a lista de equipes na ordem em que foram sorteadas para uma categoria, etapa e bateria.
+      parameters:
+        - $ref: '#/components/parameters/CategoriaQuery'
+        - $ref: '#/components/parameters/EtapaQuery'
+        - $ref: '#/components/parameters/BateriaQuery'
+      responses:
+        '200':
+          description: Ordem das equipes sorteadas.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EquipeSorteada'
+        '400':
+          description: Parâmetros obrigatórios ausentes.
+        '404':
+          description: Nenhum sorteio encontrado.
+        '500':
+          description: Erro interno no servidor.
+    delete:
+      tags:
+        - Sorteio
+      summary: Apagar um sorteio
+      description: Remove um registro de sorteio e a ordem das equipes associada.
+      parameters:
+        - $ref: '#/components/parameters/CategoriaQuery'
+        - $ref: '#/components/parameters/EtapaQuery'
+        - $ref: '#/components/parameters/BateriaQuery'
+      responses:
+        '200':
+          description: Sorteio apagado com sucesso.
+        '400':
+          description: Parâmetros obrigatórios ausentes.
+        '404':
+          description: Nenhum sorteio encontrado para apagar.
+        '500':
+          description: Erro interno no servidor.
+
+  /ranking:
+    get:
+      tags:
+        - Ranking
+      summary: Gerar ranking
+      description: Gera e retorna o ranking de uma bateria, ordenado pelo número de checkpoints e, como critério de desempate, pelo menor tempo.
+      parameters:
+        - $ref: '#/components/parameters/CategoriaQuery'
+        - $ref: '#/components/parameters/EtapaQuery'
+        - $ref: '#/components/parameters/BateriaQuery'
+      responses:
+        '200':
+          description: Ranking gerado com sucesso.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ItemRanking'
+        '404':
+          description: Nenhuma equipe encontrada para essa categoria.
+        '500':
+          description: Erro ao gerar ranking.
+
+components:
+  schemas:
+    EquipeCompleta:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nome:
+          type: string
+          example: "Equipe Alpha"
+        categoria:
+          type: integer
+          example: 0
+        participantes:
+          type: array
+          items:
+            type: string
+          example: ["João Silva (Capitão)", "Maria Souza"]
+    NovaEquipe:
+      type: object
+      required:
+        - nome
+        - participantes
+        - categoria
+      properties:
+        nome:
+          type: string
+          example: "Equipe Beta"
+        participantes:
+          type: array
+          items:
+            type: string
+          example: ["Carlos Lima", "Ana Costa"]
+        categoria:
+          type: integer
+          example: 1
+    AtualizarEquipe:
+      type: object
+      properties:
+        nome:
+          type: string
+          example: "Novo Nome da Equipe"
+        categoria:
+          type: integer
+          example: 2
+        participantes:
+          type: array
+          items:
+            type: string
+          example: ["Novo Capitão", "Novo Membro 1", "Novo Membro 2"]
+    TentativaCompleta:
+      type: object
+      properties:
+        id:
+          type: integer
+        id_equipe:
+          type: integer
+        etapa:
+          type: integer
+        bateria:
+          type: integer
+        tentativa:
+          type: integer
+        checkpoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/Checkpoint'
+    Checkpoint:
+      type: object
+      properties:
+        id:
+          type: integer
+        id_tentativa:
+          type: integer
+        num:
+          type: integer
+          example: 0
+        tempo:
+          type: string
+          example: "00:25.111"
+    AtualizarTentativa:
+      type: object
+      required:
+        - etapa
+        - bateria
+        - tentativa
+        - checkpoints
+      properties:
+        etapa:
+          type: integer
+          example: 1
+        bateria:
+          type: integer
+          example: 0
+        tentativa:
+          type: integer
+          example: 0
+        checkpoints:
+          type: array
+          items:
+            type: string
+            example: "00:14.987"
+    NovoSorteio:
+      type: object
+      required:
+        - categoria
+        - etapa
+        - bateria
+        - equipesSorteadas
+      properties:
+        categoria:
+          type: integer
+          example: 0
+        etapa:
+          type: integer
+          example: 1
+        bateria:
+          type: integer
+          example: 2
+        equipesSorteadas:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 5
+    EquipeSorteada:
+      type: object
+      properties:
+        id:
+          type: integer
+        nome:
+          type: string
+        categoria:
+          type: integer
+        ordem:
+          type: integer
+    ItemRanking:
+      type: object
+      properties:
+        nome:
+          type: string
+          example: "Equipe Gamma"
+        checkpoints:
+          type: integer
+          example: 5
+        tempo_total:
+          type: string
+          nullable: true
+          example: "01:32.456"
+        melhor_tentativa:
+          type: integer
+          nullable: true
+          example: 2
+  parameters:
+    IdEquipePath:
+      in: path
+      name: id_equipe
+      required: true
+      schema:
+        type: integer
+      description: ID da equipe.
+    IdEquipeQuery:
+      in: query
+      name: id_equipe
+      required: true
+      schema:
+        type: integer
+      description: ID da equipe.
+    CategoriaQuery:
+      in: query
+      name: categoria
+      required: true
+      schema:
+        type: integer
+      description: ID da Categoria.
+    EtapaQuery:
+      in: query
+      name: etapa
+      required: true
+      schema:
+        type: integer
+      description: Número da etapa (0 a 3).
+    BateriaQuery:
+      in: query
+      name: bateria
+      required: true
+      schema:
+        type: integer
+      description: Número da bateria (0 a 2).
+    TentativaQuery:
+      in: query
+      name: tentativa
+      required: true
+      schema:
+        type: integer
+      description: Número da tentativa (0 ou 1).
