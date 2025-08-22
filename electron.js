@@ -43,19 +43,13 @@ function createWindow() {
 
 
   const isDev = false;
-  const devURL = "http://localhost:5175";
+  const devURL = "http://localhost:5173";
 
   if (isDev) {
     win.loadURL(devURL);
     win.webContents.openDevTools();
   } else {
-    // 2. ALTERE ESTA PARTE
-    // Em vez de win.loadFile, use win.loadURL com o caminho do ficheiro construído corretamente.
-    const appURL = new URL(
-      path.join(__dirname, 'front/dist/index.html'),
-      'file:'
-    ).toString();
-    win.loadURL(appURL);
+    win.loadFile(path.join(__dirname, 'front/dist/index.html'));
   }
 }
 
