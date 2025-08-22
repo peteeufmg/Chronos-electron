@@ -18,7 +18,6 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      # Cada passo (com '-') deve estar indentado sob 'steps'
       - name: Check out git repository
         uses: actions/checkout@v4
 
@@ -30,6 +29,10 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      # ---- NOVO PASSO ADICIONADO AQUI ----
+      - name: Install Frontend Dependencies
+        run: npm install --prefix front
 
       - name: Build Frontend
         run: npm run build-frontend
