@@ -4,6 +4,7 @@
     "description": "Sistema de sensoriamento para a CoRA",
     "author": "Julio Teodoro",
     "main": "electron.js",
+    "productName": "Chronos",
     "homepage": "./",
     "repository": {
       "type": "git",
@@ -23,7 +24,6 @@
     "config": {
       "forge": {
         "packagerConfig": {
-          "productName": "Chronos",
           "asar": true,
           "icon": "assets/icon",
           "ignore": [
