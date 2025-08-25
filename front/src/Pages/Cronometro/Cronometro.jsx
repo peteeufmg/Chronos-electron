@@ -190,8 +190,8 @@ function Cronometro() {
         // Conta quantos checkpoints já foram preenchidos.
         const checkpointsPreenchidos = checkpoints.filter(c => c !== undefined).length;
 
-        // Se 7 checkpoints já foram salvos, exibe uma mensagem e não faz mais nada.
-        if (checkpointsPreenchidos >= 7) {
+        // Se 8 checkpoints já foram salvos, exibe uma mensagem e não faz mais nada.
+        if (checkpointsPreenchidos >= 8) {
             displayMessage("warning", "O limite de 8 checkpoints já foi atingido.");
             return; // Encerra a função aqui.
         }
