@@ -1,13 +1,20 @@
 import { NavLink } from "react-router-dom";
 import { Container, NavTitle, NavLinks } from "./style";
+import logo from "../../assets/icons/Logo.png"; // ajuste o caminho da sua imagem
+
 
 export default function NavBar() {
     return(
         <div style={{ paddingBottom: "30px" }}>
             <Container>
+
                 <NavTitle>
-                    <NavLink to="/">
-                        Chronos Web
+                    <NavLink>
+                        <img 
+                            src={logo} 
+                            alt="Logo Chronos" 
+                            style={{ width: "32px", height: "32px", objectFit: "cover" }} 
+                        />
                     </NavLink>
                 </NavTitle>
                 <NavLinks>
