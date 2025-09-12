@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { Container, NavTitle, NavLinks } from "./style";
 import logo from "../../assets/icons/Logo.png"; // ajuste o caminho da sua imagem
-
+import PETEElogo from "../../assets/icons/PETEElogo.png";
 
 export default function NavBar() {
     return(
@@ -9,12 +9,18 @@ export default function NavBar() {
             <Container>
 
                 <NavTitle>
-                    <NavLink>
+                    <NavLink style={{ display: "flex", alignItems: "center" }} to="/">
                         <img 
-                            src={logo} 
+                            src={logo}  
                             alt="Logo Chronos" 
-                            style={{ width: "32px", height: "32px", objectFit: "cover" }} 
+                            style={{ width: "100px", height: "90px", objectFit: "cover" }} 
                         />
+                        <img
+                        src={PETEElogo}
+                        alt="Logo PETEE"
+                        style={{ width: "40px", height: "56px", objectFit: "cover", marginRight: "15px" }}
+                        ></img>
+                        <span>Chronos</span>
                     </NavLink>
                 </NavTitle>
                 <NavLinks>
