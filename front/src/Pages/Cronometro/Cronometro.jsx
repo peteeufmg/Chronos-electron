@@ -190,23 +190,23 @@ function Cronometro() {
         // Conta quantos checkpoints já foram preenchidos.
         const checkpointsPreenchidos = checkpoints.filter(c => c !== undefined).length;
 
-        // Se 8 checkpoints já foram salvos, exibe uma mensagem e não faz mais nada.
-        if (checkpointsPreenchidos >= 8) {
-            displayMessage("warning", "O limite de 8 checkpoints já foi atingido.");
+        // Se 9 checkpoints já foram salvos, exibe uma mensagem e não faz mais nada.
+        if (checkpointsPreenchidos >= 9) {
+            displayMessage("warning", "O limite de 9 checkpoints já foi atingido.");
             return; // Encerra a função aqui.
         }
 
         let tempoAdicionado = false;
-        // O laço agora vai de 0 a 7, respeitando o limite de 8 checkpoints.
-        for(let i = 0; i < 8; i++) {
+        // O laço agora vai de 0 a 9, respeitando o limite de 10 checkpoints.
+        for(let i = 0; i < 9; i++) {
             if (checkpoints[i] === undefined && !tempoAdicionado) {
                 let updatedCheckpoints = [...checkpoints];
                 updatedCheckpoints[i] = time;
                 setCheckpoints(updatedCheckpoints);
                 tempoAdicionado = true; // Garante que o tempo seja adicionado apenas uma vez.
                 
-                // Se o checkpoint adicionado for o último (índice 7), para o cronômetro.
-                if (i === 7) {
+                // Se o checkpoint adicionado for o último (índice 9), para o cronômetro.
+                if (i === 8) {
                     onStop();
                 }
             }
@@ -323,9 +323,10 @@ function Cronometro() {
         case 5:
         case 6:
         case 7:
-        case 8: // Adicionado caso 8 aqui
+        case 8:
+        case 9: // Adicionado caso 9 aqui
             handleSensors(numberValue);
-            if (numberValue === 8) {
+            if (numberValue === 9) {
                 onStop();
             }
             break;
@@ -477,29 +478,34 @@ function Cronometro() {
                                         <Title level={2}>Checkpoint</Title>
                                         <Title level={2}>Checkpoint</Title>
                                         <Title level={2}>Checkpoint</Title>
+                                        
                                     </Flex>
                                     <Flex align="center" vertical>
                                         <Title level={2}>1</Title>
                                         <Title level={2}>2</Title>
                                         <Title level={2}>3</Title>
                                         <Title level={2}>4</Title>
+                                        
                                     </Flex>
                                     <Flex vertical>
                                         <Title level={2}>:</Title>
                                         <Title level={2}>:</Title>
                                         <Title level={2}>:</Title>
                                         <Title level={2}>:</Title>
+                                        
                                     </Flex>
                                     <Flex style={{width: 160}} align="center" vertical>
                                         <Title level={2}>{formatCheckpoint(0)}</Title>
                                         <Title level={2}>{formatCheckpoint(1)}</Title>
                                         <Title level={2}>{formatCheckpoint(2)}</Title>
                                         <Title level={2}>{formatCheckpoint(3)}</Title>
+                                        
                                     </Flex>
                                 </Flex>
                                 
                                 <Flex gap="small">
                                     <Flex align="center" vertical>
+                                        <Title level={2}>Checkpoint</Title>
                                         <Title level={2}>Checkpoint</Title>
                                         <Title level={2}>Checkpoint</Title>
                                         <Title level={2}>Checkpoint</Title>
@@ -509,9 +515,11 @@ function Cronometro() {
                                         <Title level={2}>5</Title>
                                         <Title level={2}>6</Title>
                                         <Title level={2}>7</Title>
+                                        <Title level={2}>8</Title>
                                         <Title level={2}>:</Title>
                                     </Flex>
                                     <Flex vertical>
+                                        <Title level={2}>:</Title>
                                         <Title level={2}>:</Title>
                                         <Title level={2}>:</Title>
                                         <Title level={2}>:</Title>
@@ -522,6 +530,7 @@ function Cronometro() {
                                         <Title level={2}>{formatCheckpoint(5)}</Title>
                                         <Title level={2}>{formatCheckpoint(6)}</Title>
                                         <Title level={2}>{formatCheckpoint(7)}</Title>
+                                        <Title level={2}>{formatCheckpoint(8)}</Title>
                                     </Flex>
                                 </Flex>
                             </Flex>

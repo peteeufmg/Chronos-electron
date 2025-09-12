@@ -93,7 +93,7 @@ Ambas as versões acessarão e modificarão o mesmo arquivo de banco de dados lo
    npm start
    ```
 
-5. **Compilar a Aplicação (Build):**  
+5. **Compilar a Aplação (Build):**  
    ```bash
    npm run make
    ```
