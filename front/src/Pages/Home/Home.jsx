@@ -13,7 +13,8 @@ function Home() {
                     <Link to='/sorteio'><Links>Sorteios</Links></Link>
                     <Link to='/classificacao'><Links>Ranking</Links></Link>
                     <Link to='/equipes'><Links>Equipes</Links></Link>
-                    <Link to='/sumo'><Links>Sumô</Links></Link>
+                    <Link to='/liz'><Links>Sumô</Links></Link>
+
                 </DivLinks>
             </DivContainer>
     )

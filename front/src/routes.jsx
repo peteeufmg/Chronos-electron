@@ -9,11 +9,13 @@ import {
 
 import NavBar from "./Components/NavBar";
 
+
 const Home = lazy(() => import("./Pages/Home"));
 const Equipes = lazy(() => import("./Pages/Equipes"));
 const Ranking = lazy(() => import("./Pages/Ranking"));
 const Sorteio = lazy(() => import("./Pages/Sorteio"));
 const Cronometro = lazy(() => import("./Pages/Cronometro"));
+const Liz = lazy(() => import("./Pages/Liz"));
 
 // Layout com Navbar
 function MainLayout() {
@@ -37,6 +39,7 @@ const router = createHashRouter(
                 <Route path="/classificacao" element={<Ranking />} />
                 <Route path="/sorteio" element={<Sorteio />} />
                 <Route path="/cronometro" element={<Cronometro />} />
+                <Route path="/liz" element={<Liz />} />
             </Route>
         </Route>
     )

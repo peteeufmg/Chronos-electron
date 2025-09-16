@@ -9,7 +9,9 @@ export default function NavBar() {
             <Container>
 
                 <NavTitle>
+               
                     <NavLink style={{ display: "flex", alignItems: "center" }} to="/">
+                    <span>Chronos</span>
                         <img 
                             src={logo}  
                             alt="Logo Chronos" 
@@ -20,7 +22,7 @@ export default function NavBar() {
                         alt="Logo PETEE"
                         style={{ width: "40px", height: "56px", objectFit: "cover", marginRight: "15px" }}
                         ></img>
-                        <span>Chronos</span>
+                     
                     </NavLink>
                 </NavTitle>
                 <NavLinks>
@@ -28,6 +30,7 @@ export default function NavBar() {
                     <NavLink to="/classificacao">Ranking</NavLink>
                     <NavLink to="/equipes">Equipes</NavLink>
                     <NavLink to="/sorteio">Sorteio</NavLink>
+                    <NavLink to="/liz">Sumô</NavLink>
                 </NavLinks>
             </Container>
         </div>
