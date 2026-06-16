@@ -246,6 +246,23 @@ function Cronometro() {
             setCheckpoints(updatedCheckpoints); // Define o novo array como o estado
         }
     }
+// Função para excluir exclusivamente o último checkpoint registrado
+    const removerUltimoCheckpoint = () => {
+        // Filtra para pegar apenas os checkpoints que já têm tempo gravado
+        const validCheckpoints = checkpoints.filter(c => c !== undefined);
+
+        if (validCheckpoints.length === 0) {
+            displayMessage("warning", "Não há checkpoints registrados para remover.");
+            return;
+        }
+
+        // Corta o último elemento da lista e diminui o tamanho do array
+        validCheckpoints.pop();
+
+        // Atualiza a tela com a lista menor
+        setCheckpoints(validCheckpoints);
+        displayMessage("success", "Último checkpoint excluído com sucesso.");
+    }
 
     //Função para achamar alertas
     const displayMessage = (type, content) => {
@@ -535,7 +552,8 @@ function Cronometro() {
                                 </Flex>
                             </Flex>
                         </ConfigProvider>
-                        {/* Editar/SAlvar checkpoints */}
+              
+{/* Editar/SAlvar checkpoints */}
                         <Flex gap="large" justify="space-between">
                             <Flex gap="large">
                                 <Search
@@ -547,8 +565,29 @@ function Cronometro() {
                                     style={{width: 450}}
                                 />
                             </Flex>
-                            <Button type="Add" text="Adicionar tempo" onClick={saveTime} />
+                            
+                            {/* Novos botões agrupados */}
+                            <Flex gap="small">
+                                <Popconfirm
+                                    title="Excluir último checkpoint?"
+                                    description="Tem certeza que deseja apagar o tempo do último sensor?"
+                                    onConfirm={removerUltimoCheckpoint}
+                                    okText="Sim, excluir"
+                                    cancelText="Cancelar"
+                                    placement="topRight"
+                                >
+                                    {/* A div ao redor do botão garante que o Popconfirm funcione mesmo em botões customizados */}
+                                    <div style={{ display: "flex", height: "100%", alignItems: "stretch" }}>
+                                        <Button type="Delete" text="Excluir Checkpoint" />
+                                    </div>
+                                </Popconfirm>
+                                <Button type="Add" text="Adicionar tempo" onClick={saveTime} />
+                            </Flex>
                         </Flex>
+
+
+
+
                         <Flex gap="large" justify="right">
                             <Button type="Delete" text="Apagar" onClick={apagarTentativa} />
                             <Button type="Salvar" text="Salvar" onClick={adicionarTentativa} />

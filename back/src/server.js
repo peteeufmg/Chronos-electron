@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const routes = require('./routes/routes');
 
-module.exports = function startServer() {
+function startServer() {
     const app = express();
 
     // Middlewares
@@ -17,9 +17,13 @@ module.exports = function startServer() {
         console.log(`Servidor executando na porta ${PORT}`);
     });
 
-    // Fechar servidor quando Electron encerrar
-    const { app: electronApp } = require('electron');
-    electronApp.on('will-quit', () => {
-        server.close(() => console.log('Servidor Express fechado.'));
-    });
-};
+    // Curativo: Comentamos a parte do Electron temporariamente para conseguirmos testar pelo Chrome
+    // const { app: electronApp } = require('electron');
+    // electronApp.on('will-quit', () => {
+    //     server.close(() => console.log('Servidor Express fechado.'));
+    // });
+}
+
+// Exporta a função e JÁ LIGA O SERVIDOR na mesma hora!
+module.exports = startServer;
+startServer();

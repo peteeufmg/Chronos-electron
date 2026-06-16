@@ -3,7 +3,7 @@ const path = require('path');
 const { app } = require("electron");
 const fs = require('fs');
 
-const isProd = app.isPackaged;
+const isProd = false;
 
 let dbPath;
 
