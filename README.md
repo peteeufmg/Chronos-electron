@@ -1,6 +1,6 @@
 # **Chronos - Sistema de Sensoriamento**
 
-**Chronos** é um sistema de desktop multiplataforma (Windows e macOS) desenvolvido para cronometragem e sensoriamento de competições, como as realizadas pela CoRA (Comissão de Robótica de Alfenas). O sistema foi construído para ser robusto, portátil e fácil de usar, com um backend local para gerenciamento de dados e comunicação com hardware externo via porta serial.
+**Chronos** é um sistema de desktop multiplataforma (Windows e macOS) desenvolvido para cronometragem e sensoriamento de competições, como as realizadas pela CoRA (Competição de Robôs Autônomos). O sistema foi construído para ser robusto, portátil e fácil de usar, com um backend local para gerenciamento de dados e comunicação com hardware externo via porta serial.
 
 ## **Tabela de Conteúdos**
 
